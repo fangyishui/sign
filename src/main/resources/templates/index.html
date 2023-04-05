@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>签到页面</title>
+    <link rel="stylesheet" href="/bootstrap_5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #F6EEE7;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .card {
+            width: 90%;
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-weight: bold;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #E17055;
+        }
+        p {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #6C757D;
+        }
+        #sign-in-btn {
+            background-color: #FFA500;
+            border-color: #FFA500;
+            font-size: 1.5rem;
+            font-weight: bold;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .alert {
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .alert-success {
+            background-color: #28A745;
+            color: #FFFFFF;
+        }
+        .alert-danger {
+            background-color: #DC3545;
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>签到页面</h1>
+        <select class="form-control" id="select01">
+            <option th:each="li : ${list}" th:text="${li.reason}" th:value="${li.id}">
+            </option>
+        </select>
+        <p>签到原因：请在下面签到</p>
+        <button id="sign-in-btn" type="button" class="btn">签到</button>
+    </div>
+</div>
+<script src="/bootstrap_5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="/jquery/jquery-3.6.4.min.js"></script>
+<script>
+    const signInBtn = document.querySelector("#sign-in-btn");
+    signInBtn.addEventListener("click", () => {
+
+        const time = new Date();
+        const timeStr = `${time.getFullYear()}-${time.getMonth() + 1}-${time.getDate()} ${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`;
+        const successHtml = `<div class="alert alert-success" role="alert">
+                               签到成功！签到时间：${timeStr}
+                             </div>`;
+        const failureHtml = `<div class="alert alert-danger" role="alert">
+                               签到失败！请稍后再试。
+                             </div>`;
+
+        var reason=$("#select01 option:selected").text();
+        let param = {"reason":reason};
+        $.ajax({
+            url:'add',
+            type: "POST",
+            data: param,
+            async: false,
+            success: function (data){
+                debugger
+                if(data == "success"){
+                    signInBtn.classList.add("d-none");
+                    signInBtn.insertAdjacentHTML("afterend", successHtml);
+                }else{
+                    signInBtn.insertAdjacentHTML("afterend", failureHtml);
+                }
+            },
+            error: function () {
+                signInBtn.insertAdjacentHTML("afterend", failureHtml);
+            }
+        })
+
+        // const alert = document.querySelector(".alert");
+        //
+        // if (alert) {
+        //     alert.addEventListener("animationend", () => {
+        //         alert.remove();
+        //         if (isSuccess) {
+        //             signInBtn.classList.remove("d-none");
+        //         }
+        //     }, { once: true });
+        // }
+    });
+</script>
+</body>
+</html>
